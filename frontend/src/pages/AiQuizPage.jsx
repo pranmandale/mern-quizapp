@@ -1,7 +1,15 @@
+
 import { useState } from "react";
 import { Loader2, AlertCircle, FileText, Info, List, Hash, Sparkles, CheckCircle, LayoutGrid } from "lucide-react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+
+// Helper to get a cookie value
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+};
 
 const AIQuizPage = () => {
     const [formData, setFormData] = useState({
@@ -24,11 +32,13 @@ const AIQuizPage = () => {
         setQuizGenerated(false);
 
         try {
+            const token = getCookie("accessToken");
+
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/quizzes/generate-quiz`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(formData),
             });
@@ -54,13 +64,11 @@ const AIQuizPage = () => {
 
     return (
         <div className="max-w-4xl mx-auto p-6">
-            {/* Page Title */}
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
                 <Sparkles className="text-blue-500" />
                 Generate AI Quiz
             </h1>
 
-            {/* Success Message */}
             {quizGenerated ? (
                 <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 p-6 rounded-lg flex flex-col items-center">
                     <CheckCircle className="h-12 w-12 mb-4" />
@@ -76,7 +84,6 @@ const AIQuizPage = () => {
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md space-y-6">
-                    {/* Title Input */}
                     <div>
                         <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">
                             <FileText className="inline-block mr-2 text-blue-500" />
@@ -93,7 +100,6 @@ const AIQuizPage = () => {
                         />
                     </div>
 
-                    {/* Description Input */}
                     <div>
                         <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">
                             <Info className="inline-block mr-2 text-green-500" />
@@ -110,7 +116,6 @@ const AIQuizPage = () => {
                         />
                     </div>
 
-                    {/* Difficulty Select */}
                     <div>
                         <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">
                             <List className="inline-block mr-2 text-yellow-500" />
@@ -128,7 +133,6 @@ const AIQuizPage = () => {
                         </select>
                     </div>
 
-                    {/* Number of Questions */}
                     <div>
                         <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">
                             <Hash className="inline-block mr-2 text-purple-500" />
@@ -146,7 +150,6 @@ const AIQuizPage = () => {
                         />
                     </div>
 
-                    {/* Submit Button */}
                     <button
                         type="submit"
                         disabled={loading}

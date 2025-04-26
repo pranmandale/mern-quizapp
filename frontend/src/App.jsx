@@ -23,6 +23,8 @@ import ForgotPassword from './components/ForgotPassword';
 import Verification from './components/Verification';
 import ResetPassword from './components/ResetPassword ';
 
+import Cookies from "js-cookie";
+
 
 const router = createBrowserRouter([
   {
@@ -50,7 +52,9 @@ const router = createBrowserRouter([
   { path: "/reset-password/:token", element: <ResetPassword/>},
 ]);
 
-// ✅ Refresh Token Function
+
+
+
 const refreshAccessToken = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/refresh-token`, {
@@ -64,17 +68,19 @@ const refreshAccessToken = async () => {
     }
 
     const data = await response.json();
-    localStorage.setItem('accessToken', data.data.accessToken);
+    // localStorage.setItem('accessToken', data.data.accessToken);
+    Cookies.set('accessToken', data.data.accessToken)
+
     console.log('Access token refreshed!');
   } catch (error) {
     console.error(error.message);
     toast.error(error.message);
-    localStorage.removeItem('accessToken');
+    Cookies.remove(accessToken)
     window.location.href = '/login';
   }
 };
 
-// ✅ Check Token Expiry
+
 const isTokenExpiredOrExpiringSoon = (token) => {
   try {
     const decodedToken = jwtDecode(token);
@@ -90,9 +96,10 @@ const isTokenExpiredOrExpiringSoon = (token) => {
 
 const App = () => {
   useEffect(() => {
-    // ✅ Token Refresh Logic Every 15 Minutes
+  
     const interval = setInterval(() => {
-      const accessToken = localStorage.getItem('accessToken');
+      // const accessToken = localStorage.getItem('accessToken');
+      const accessToken = Cookies.get("accessToken");
 
       if (accessToken && isTokenExpiredOrExpiringSoon(accessToken)) {
         console.log('Access token is expired or expiring soon. Attempting to refresh...');
@@ -112,3 +119,7 @@ const App = () => {
 };
 
 export default App;
+
+
+
+

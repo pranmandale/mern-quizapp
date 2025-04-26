@@ -1,5 +1,13 @@
+
 import { useEffect, useState } from "react";
 import { CalendarClock, Award, AlertCircle, Loader2 } from 'lucide-react';
+
+// Helper function to get cookie value by name
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+};
 
 const HistoryPage = () => {
   const [attempts, setAttempts] = useState([]);
@@ -11,12 +19,14 @@ const HistoryPage = () => {
 
   const fetchAttempts = async () => {
     try {
+      const token = getCookie("accessToken"); // Retrieve the token from cookies
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/quizzes/user/attempts`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
       });
       const data = await response.json();
       if (data.success) {
@@ -81,7 +91,7 @@ const HistoryPage = () => {
                     </time>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center">
                   <div className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 px-3 py-1.5 rounded-lg">
                     <Award className="h-4 w-4" />

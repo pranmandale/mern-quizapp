@@ -72,6 +72,7 @@ const Register = () => {
       const result = await response.json()
 
       if (response.ok) {
+        localStorage.setItem("accessToken", result.data.accessToken);
         setSuccessMessage("Verification email sent! Redirecting...")
         toast.success("📧 Verification email sent!")
         setTimeout(() => navigate("/verification"), 2500)

@@ -32,6 +32,7 @@ const ResetPassword = () => {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ password, confirmPassword }),
+                credentials: 'include',
             })
 
 

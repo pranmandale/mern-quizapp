@@ -199,15 +199,15 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
-// Fetch current user data
+
 const getCurrentUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select(
-    "-password -refreshToken"
-  );
+  const user = await User.findById(req.user._id).select("-password -refreshToken");
+
   return res
     .status(200)
-    .json(new ApiResponse(200, req.user, "Current user data fetched"));
+    .json(new ApiResponse(200, user, "Current user data fetched")); // changed req.user to user
 });
+
 
 // Update user profile
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -328,6 +328,8 @@ const sendVerificationCode = async (verificationCode, email) => {
 
 
 
+
+
 const verifyOTP = asyncHandler(async (req, res) => {
   const { otp } = req.body;
 
@@ -349,11 +351,6 @@ const verifyOTP = asyncHandler(async (req, res) => {
       password,
       email
     } = tempUser;
-
-    // Debugging logs
-    console.log("OTP from user:", otp);
-    console.log("Expected OTP:", verificationCode);
-    console.log("OTP Expiry:", verificationCodeExpire);
 
     if (Number(otp) !== verificationCode) {
       return res.status(400).json({
@@ -382,7 +379,6 @@ const verifyOTP = asyncHandler(async (req, res) => {
 
     await sendToken(user, 200, "User registered and verified successfully!", res);
 
-    
   } catch (error) {
     console.error("Error in verifyOTP:", error);
     return res.status(500).json({
@@ -391,7 +387,6 @@ const verifyOTP = asyncHandler(async (req, res) => {
     });
   }
 });
-
 
 
 

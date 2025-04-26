@@ -255,6 +255,7 @@ const attemptQuiz = asyncHandler(async (req, res) => {
   let score = 0;
   const updatedAnswers = answers.map(answer => {
     const question = quiz.questions.id(answer.questionId);
+    
     if (!question) {
       throw new ApiError(400, "Invalid question ID provided");
     }

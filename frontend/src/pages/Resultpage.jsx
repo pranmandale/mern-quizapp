@@ -1,8 +1,16 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Award, BookOpen, CalendarClock, CheckCircle, XCircle, Loader2, AlertCircle } from 'lucide-react';
 import Leaderboard from "../components/Leaderboard";
+
+// Helper function to get cookie by name
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+};
 
 const ResultPage = () => {
   const { id } = useParams(); // Quiz ID from URL
@@ -19,34 +27,34 @@ const ResultPage = () => {
     fetchAttempts();
   }, []);
 
+  
   const fetchAttempts = async () => {
     try {
+      const token = getCookie('accessToken'); // Retrieve the token from cookies
+
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/quizzes/user/attempts`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Corrected value
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error: ${response.status} - ${errorText}`);
       }
-  
+
       const data = await response.json();
-      // console.log(data);
-  
       if (data.success && Array.isArray(data.data)) {
         const quizAttempts = data.data.filter((attempt) => attempt.quizId?._id === id);
-        // console.log("Hello", quizAttempts);
-  
         if (quizAttempts.length > 0) {
           setAttempts(quizAttempts);
-  
+
           const latestAttempt = quizAttempts[0];
           if (latestAttempt.quizId?.title) {
             setQuizTitle(latestAttempt.quizId.title);
           }
-  
+
           fetchQuizDetails(id, latestAttempt);
         }
       } else {
@@ -57,14 +65,20 @@ const ResultPage = () => {
       toast.error(`An error occurred: ${error.message}`);
     }
   };
-  
 
   const fetchQuizDetails = async (quizId, latestAttempt) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/quizzes/${id}`, {
+      
+
+      const token = localStorage.getItem("accessToken");
+
+      
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/quizzes/${quizId}`, {
+
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
       });
 
       const data = await response.json();
@@ -141,12 +155,12 @@ const ResultPage = () => {
             </div>
 
             <div className={`flex-1 rounded-lg p-4 ${status === "passed"
-                ? "bg-green-50 dark:bg-green-900/20"
-                : "bg-red-50 dark:bg-red-900/20"
+              ? "bg-green-50 dark:bg-green-900/20"
+              : "bg-red-50 dark:bg-red-900/20"
               }`}>
               <div className={`text-sm font-medium ${status === "passed"
-                  ? "text-green-700 dark:text-green-400"
-                  : "text-red-700 dark:text-red-400"
+                ? "text-green-700 dark:text-green-400"
+                : "text-red-700 dark:text-red-400"
                 } mb-1`}>
                 Result
               </div>
@@ -180,7 +194,7 @@ const ResultPage = () => {
             </button>
           </div>
 
-          <Leaderboard/>
+          <Leaderboard />
 
           <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -208,7 +222,6 @@ const ResultPage = () => {
             </div>
           </div>
         </div>
-
 
       </div>
     </div>

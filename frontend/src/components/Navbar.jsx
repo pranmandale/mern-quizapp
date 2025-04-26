@@ -34,11 +34,11 @@ const Navbar = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/logout`, {
         method: "POST",
-        credentials: "include", // Ensure cookies are sent
+        credentials: "include",
       });
 
       if (response.ok) {
-        localStorage.removeItem("accessToken"); // Optional, depending on your token storage strategy
+        localStorage.removeItem("accessToken"); 
         toast.success("Logged out successfully!");
         navigate("/login");
       } else {
